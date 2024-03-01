@@ -1,17 +1,22 @@
 ![Logo](./logo/logo.png)
 
-[![Node.js CI](https://github.com/node-cache/node-cache/workflows/Node.js%20CI/badge.svg?branch=master)](https://github.com/node-cache/node-cache/actions?query=workflow%3A%22Node.js+CI%22+branch%3A%22master%22)
-![Dependency status](https://img.shields.io/david/node-cache/node-cache)
-[![NPM package version](https://img.shields.io/npm/v/node-cache?label=npm%20package)](https://www.npmjs.com/package/node-cache)
-[![NPM monthly downloads](https://img.shields.io/npm/dm/node-cache)](https://www.npmjs.com/package/node-cache)
-[![GitHub issues](https://img.shields.io/github/issues/node-cache/node-cache)](https://github.com/node-cache/node-cache/issues)
-[![Coveralls Coverage](https://img.shields.io/coveralls/node-cache/node-cache.svg)](https://coveralls.io/github/node-cache/node-cache)
+[![Node.js CI](https://github.com/snow-cache/snow-cache/workflows/Node.js%20CI/badge.svg?branch=master)](https://github.com/snow-cache/snow-cache/actions?query=workflow%3A%22Node.js+CI%22+branch%3A%22master%22)
+![Dependency status](https://img.shields.io/david/snow-cache/snow-cache)
+[![NPM package version](https://img.shields.io/npm/v/snow-cache?label=npm%20package)](https://www.npmjs.com/package/snow-cache)
+[![NPM monthly downloads](https://img.shields.io/npm/dm/snow-cache)](https://www.npmjs.com/package/snow-cache)
+[![GitHub issues](https://img.shields.io/github/issues/snow-cache/snow-cache)](https://github.com/snow-cache/snow-cache/issues)
+[![Coveralls Coverage](https://img.shields.io/coveralls/snow-cache/snow-cache.svg)](https://coveralls.io/github/snow-cache/snow-cache)
 
 # Simple and fast NodeJS internal caching.
+
+Forked from [node-cache](https://github.com/node-cache/node-cache) grate work by [Josh Gwosdz](https://github.com/erdii), [M. Peter](https://github.com/mpneuried), [Daniel Luft](https://github.com/daluf) and [others](https://github.com/node-cache/node-cache/graphs/contributors).
 
 A simple caching module that has `set`, `get` and `delete` methods and works a little bit like memcached.
 Keys can have a timeout (`ttl`) after which they expire and are deleted from the cache.
 All keys are stored in a single object so the practical limit is at around 1m keys.
+
+We took 5.1.2 rewriten it to TypeScript and added high performance options in separate class 
+
 
 
 ## BREAKING MAJOR RELEASE v5.x
@@ -23,13 +28,13 @@ The recent 5.x release:
 ## BREAKING MAJOR RELEASE v6.x UPCOMING
 
 Although not breaking per definition, our typescript rewrite will change internal functions and their names.
-Please get in contact with us, if you are using some parts of node-cache's internal api so we can work something out!
+Please get in contact with us, if you are using some parts of snow-cache's internal api so we can work something out!
 
 
 # Install
 
 ```bash
-	npm install node-cache --save
+	npm install snow-cache --save
 ```
 
 Or just require the `node_cache.js` file to get the superclass
@@ -39,7 +44,7 @@ Or just require the `node_cache.js` file to get the superclass
 ## Initialize (INIT):
 
 ```js
-const NodeCache = require( "node-cache" );
+const NodeCache = require( "snow-cache" );
 const myCache = new NodeCache();
 ```
 
@@ -56,11 +61,11 @@ const myCache = new NodeCache();
 	- _Here's a [simple code example](https://runkit.com/mpneuried/useclones-example-83) showing the different behavior_
 - `deleteOnExpire`: *(default: `true`)* whether variables will be deleted automatically when they expire.
 If `true` the variable will be deleted. If `false` the variable will remain. You are encouraged to handle the variable upon the event `expired` by yourself.
-- `enableLegacyCallbacks`: *(default: `false`)* re-enables the usage of callbacks instead of sync functions. Adds an additional `cb` argument to each function which resolves to `(err, result)`. will be removed in node-cache v6.x.
+- `enableLegacyCallbacks`: *(default: `false`)* re-enables the usage of callbacks instead of sync functions. Adds an additional `cb` argument to each function which resolves to `(err, result)`. will be removed in snow-cache v6.x.
 - `maxKeys`: *(default: `-1`)* specifies a maximum amount of keys that can be stored in the cache. If a new item is set and the cache is full, an error is thrown and the key will not be saved in the cache. -1 disables the key limit.
 
 ```js
-const NodeCache = require( "node-cache" );
+const NodeCache = require( "snow-cache" );
 const myCache = new NodeCache( { stdTTL: 100, checkperiod: 120 } );
 ```
 
@@ -413,7 +418,7 @@ Callbacks are deprecated in this version. They are still useable when enabling t
 
 ## Compatibility
 
-Node-Cache supports all node versions >= 8
+snow-cache supports all node versions >= 8
 
 ## Release History
 |Version|Date|Description|
@@ -448,7 +453,7 @@ Node-Cache supports all node versions >= 8
 |0.4.0|2013-10-02|Added nodecache events|
 |0.3.2|2012-05-31|Added Travis tests|
 
-[![NPM](https://nodei.co/npm-dl/node-cache.png?months=6)](https://nodei.co/npm/node-cache/)
+[![NPM](https://nodei.co/npm-dl/snow-cache.png?months=6)](https://nodei.co/npm/snow-cache/)
 
 ## Other projects
 
@@ -476,7 +481,7 @@ Node-Cache supports all node versions >= 8
 
 # The MIT License (MIT)
 
-Copyright © 2019 Mathias Peter and the node-cache maintainers, https://github.com/node-cache/node-cache
+Copyright © 2019 Mathias Peter and the snow-cache maintainers, https://github.com/snow-cache/snow-cache
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
