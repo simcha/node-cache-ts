@@ -1,15 +1,6 @@
-![Logo](./logo/logo.png)
-
-[![Node.js CI](https://github.com/snow-cache/snow-cache/workflows/Node.js%20CI/badge.svg?branch=master)](https://github.com/snow-cache/snow-cache/actions?query=workflow%3A%22Node.js+CI%22+branch%3A%22master%22)
-![Dependency status](https://img.shields.io/david/snow-cache/snow-cache)
-[![NPM package version](https://img.shields.io/npm/v/snow-cache?label=npm%20package)](https://www.npmjs.com/package/snow-cache)
-[![NPM monthly downloads](https://img.shields.io/npm/dm/snow-cache)](https://www.npmjs.com/package/snow-cache)
-[![GitHub issues](https://img.shields.io/github/issues/snow-cache/snow-cache)](https://github.com/snow-cache/snow-cache/issues)
-[![Coveralls Coverage](https://img.shields.io/coveralls/snow-cache/snow-cache.svg)](https://coveralls.io/github/snow-cache/snow-cache)
-
 # Simple and fast NodeJS internal caching.
 
-Forked from [node-cache](https://github.com/node-cache/node-cache) grate work by [Josh Gwosdz](https://github.com/erdii), [M. Peter](https://github.com/mpneuried), [Daniel Luft](https://github.com/daluf) and [others](https://github.com/node-cache/node-cache/graphs/contributors).
+Forked from [node-cache](https://github.com/node-cache/node-cache) great work by [Josh Gwosdz](https://github.com/erdii), [M. Peter](https://github.com/mpneuried), [Daniel Luft](https://github.com/daluf) and [others](https://github.com/node-cache/node-cache/graphs/contributors).
 
 A simple caching module that has `set`, `get` and `delete` methods and works a little bit like memcached.
 Keys can have a timeout (`ttl`) after which they expire and are deleted from the cache.
@@ -17,27 +8,17 @@ All keys are stored in a single object so the practical limit is at around 1m ke
 
 We took 5.1.2 rewriten it to TypeScript and added high performance options in separate class 
 
+## BREAKING CHANGES since node-cache
 
+Although not breaking per definition, our typescript rewrite changed internal function.
 
-## BREAKING MAJOR RELEASE v5.x
-
-The recent 5.x release:
-* dropped support for node versions before 8.x!
-* removed the callback-based api from all methods (you can re-enable them with the option `enableLegacyCallbacks`)
-
-## BREAKING MAJOR RELEASE v6.x UPCOMING
-
-Although not breaking per definition, our typescript rewrite will change internal functions and their names.
-Please get in contact with us, if you are using some parts of snow-cache's internal api so we can work something out!
-
+Cache is not suporting `useClones` option set to `true` with functions as values. Use `SnowCache` to achive similar or better effect.
 
 # Install
 
 ```bash
 	npm install snow-cache --save
 ```
-
-Or just require the `node_cache.js` file to get the superclass
 
 # Examples:
 
@@ -61,17 +42,67 @@ const myCache = new NodeCache();
 	- _Here's a [simple code example](https://runkit.com/mpneuried/useclones-example-83) showing the different behavior_
 - `deleteOnExpire`: *(default: `true`)* whether variables will be deleted automatically when they expire.
 If `true` the variable will be deleted. If `false` the variable will remain. You are encouraged to handle the variable upon the event `expired` by yourself.
-- `enableLegacyCallbacks`: *(default: `false`)* re-enables the usage of callbacks instead of sync functions. Adds an additional `cb` argument to each function which resolves to `(err, result)`. will be removed in snow-cache v6.x.
 - `maxKeys`: *(default: `-1`)* specifies a maximum amount of keys that can be stored in the cache. If a new item is set and the cache is full, an error is thrown and the key will not be saved in the cache. -1 disables the key limit.
 
-```js
-const NodeCache = require( "snow-cache" );
-const myCache = new NodeCache( { stdTTL: 100, checkperiod: 120 } );
+## NodeCache:
+
+```ts
+import NodeCache from 'snow-cache';
+const stringCache = new NodeCache<string>( { stdTTL: 100, checkperiod: 120 } );
 ```
 
-**Since `4.1.0`**:
-*Key-validation*: The keys can be given as either `string` or `number`, but are casted to a `string` internally anyway.
-All other types will throw an error.
+## SnowCache:
+
+```ts
+import { SnowCache } from 'snow-cache';
+const myServiceCache = new SnowCache<{key: string}, string>( { stdTTL: 100 }, async (args: { name: string }): Promise<string> => {
+    return await myServiceCall(args.name);
+} );
+
+const myResult = myServiceCache.call('key', { 'John' });
+```
+or if you don't like types:
+
+```js
+import { SnowCache } from 'snow-cache';
+const myServiceCache = new SnowCache( { stdTTL: 100 }, async ( args ) => {
+    return await myServiceCall(args);
+} );
+
+const myResult = myServiceCache.call('key', { 'John' });
+```
+
+`SnowCache` is generally quicker and more resilent to errors see result of our tests.
+
+|NodeCache|SnowCache|
+|:--:|:--:|
+|![node_cache throughput](./img/node_cache_throughput.png)|![snow_cache throughput](./img/snow_cache_throughput.png)
+![node_cache latency](./img/node_cache_latency.png)|![snow_cache latency](./img/snow_cache_latency.png)
+
+>Beware on the lateny graph scale is not linear
+
+Here the test for the flaky service throwing error code 500 with probability of 1%:
+
+|NodeCache|SnowCache|
+|:--:|:--:|
+|![node_cache errors](./img/node_cache_errors.png)|![snow_cache errors](./img/snow_cache_errors.png)
+
+Errors disapear in second phase of the tests as subsequent calls are repeated in case of error and the chance of error reachng to customer is very low. 
+
+And data is refreshed in the same phase. However number of calls to the server is significantly lower. Due to the fact that SnowCashe will call the server only for cached arguments and NodeCache will call as many times as many threads ask for same inforation and no data is in the cache.
+
+## Only in SnowCache (rest is inherited from NodeCache):
+`myCache.call( key, { arg1 } )`
+
+Cache will call a method past during construction and cache both it's result and arguments for that method under the `key`. Both arguments and result well be selialized unless `option.argsUseClones` is set to false.
+
+Method will return the value if it is cached from the cache if it is not cached from the method past during construction. Method will be called again after `ttr` passes with first arguments for the given `key`. When after `ttr` the `call` method is used arguments will be remembered again and used in next call. 
+
+If the method called in the backround returns an error the method will be called again if `stdTTL` is not reached. On error `refresh_error` event will be emited __remember__ to catch it and __log__ it or act upon it. 
+
+```ts
+const myResult = myServiceCache.call('key', { 'John' });
+```
 
 ## Store a key (SET):
 
@@ -79,6 +110,9 @@ All other types will throw an error.
 
 Sets a `key` `value` pair. It is possible to define a `ttl` (in seconds).
 Returns `true` on success.
+
+*Key-validation*: The keys can be given as either `string` or `number`, but are casted to a `string` internally anyway.
+All other types will throw an error.
 
 ```js
 obj = { my: "Special", variable: 42 };
@@ -88,7 +122,6 @@ success = myCache.set( "myKey", obj, 10000 );
 ```
 
 > Note: If the key expires based on it's `ttl` it will be deleted entirely from the internal data object.
-
 
 ## Store multiple keys (MSET):
 
@@ -344,6 +377,17 @@ myCache.close();
 
 # Events
 
+## refresh_error (SnowCache only)
+
+On error `refresh_error` event will be emited __remember__ to catch it and __log__ it or act upon it. 
+
+```ts
+myCache.on( "set", function( error, key, args) ){
+	// ... do something ...
+	console.log(error); //or something similar
+});
+```
+
 ## set
 
 Fired when a key has been added or changed.
@@ -397,68 +441,22 @@ myCache.on( "flush_stats", function(){
 });
 ```
 
-
-## Breaking changes
-
-### version `2.x`
-
-Due to the [Issue #11](https://github.com/mpneuried/nodecache/issues/11) the return format of the `.get()` method has been changed!
-
-Instead of returning an object with the key `{ "myKey": "myValue" }` it returns the value itself `"myValue"`.
-
-### version `3.x`
-
-Due to the [Issue #30](https://github.com/mpneuried/nodecache/issues/30) and [Issue #27](https://github.com/mpneuried/nodecache/issues/27) variables will now be cloned.
-This could break your code, because for some variable types ( e.g. Promise ) its not possible to clone them.
-You can disable the cloning by setting the option `useClones: false`. In this case it's compatible with version `2.x`.
-
-### version `5.x`
-
-Callbacks are deprecated in this version. They are still useable when enabling the `enableLegacyCallbacks` option when initializing the cache. Callbacks will be completely removed in `6.x`.
-
 ## Compatibility
 
-snow-cache supports all node versions >= 8
+snow-cache supports all node versions >= 8 (check!!!)
 
 ## Release History
+
 |Version|Date|Description|
 |:--:|:--:|:--|
-|5.1.2|2020-07-01|[#195] type definition for `.take()` and typo fixes, thx [shhadi](https://github.com/shhadi)!, [#198]/[#197] error when setting a value in a js environment without `Buffer` in global scope, thanks [jdussouillez](https://github.com/jdussouillez) and [Sirz3chs](https://github.com/Sirz3chs) for your help|
-|5.1.1|2020-06-06|[#184], [#183] thanks [Jonah Werre](https://github.com/jwerre) for reporting [#181]!, [#180], Thanks [Titus](https://github.com/tstone) for [#169]!, Thanks [Ianfeather](https://github.com/Ianfeather) for [#168]!, Thanks [Adam Haglund](https://github.com/BeeeQueue) for [#176]|
-|5.1.0|2019-12-08|Add .take() from PR [#160] and .flushStats from PR [#161]. Thanks to [Sujesh Thekkepatt](https://github.com/sujeshthekkepatt) and [Gopalakrishna Palem](https://github.com/KrishnaPG)!|
-|5.0.2|2019-11-17|Fixed bug where expired values were deleted even though `deleteOnExpire` was set to `false`. Thanks to [fielding-wilson](https://github.com/fielding-wilson)!|
-|5.0.1|2019-10-31|Fixed bug where users could not set null values. Thanks to [StefanoSega](https://github.com/StefanoSega), [jwest23](https://github.com/jwest23) and [marudor](https://github.com/marudor)!|
-|5.0.0|2019-10-23|Remove lodash dependency, add .has(key) and .mset([{key,val,ttl}]) methods to the cache. Thanks to [Regev Brody](https://github.com/regevbr) for PR [#132] and [Sujesh Thekkepatt](https://github.com/sujeshthekkepatt) for PR [#142]! Also thank you, to all other contributors that remain unnamed here!|
-|4.2.1|2019-07-22|Upgrade lodash to version 4.17.15 to suppress messages about unrelated security vulnerability|
-|4.2.0|2018-02-01|Add options.promiseValueSize for promise value. Thanks to [Ryan Roemer](https://github.com/ryan-roemer) for the pull [#84]; Added option `deleteOnExpire`; Added DefinitelyTyped Typescript definitions. Thanks to [Ulf Seltmann](https://github.com/useltmann) for the pulls [#90] and [#92]; Thanks to [Daniel Jin](https://github.com/danieljin) for the readme fix in pull [#93];  Optimized test and ci configs.|
-|4.1.1|2016-12-21|fix internal check interval for node < 0.10.25, thats the default node for ubuntu 14.04. Thanks to [Jimmy Hwang](https://github.com/JimmyHwang) for the pull [#78](https://github.com/mpneuried/nodecache/pull/78); added more docker tests|
-|4.1.0|2016-09-23|Added tests for different key types; Added key validation (must be `string` or `number`); Fixed `.del` bug where trying to delete a `number` key resulted in no deletion at all.|
-|4.0.0|2016-09-20|Updated tests to mocha; Fixed `.ttl` bug to not delete key on `.ttl( key, 0 )`. This is also relevant if `stdTTL=0`. *This causes the breaking change to `4.0.0`.*|
-|3.2.1|2016-03-21|Updated lodash to 4.x.; optimized grunt |
-|3.2.0|2016-01-29|Added method `getTtl` to get the time when a key expires. See [#49](https://github.com/mpneuried/nodecache/issues/49)|
-|3.1.0|2016-01-29|Added option `errorOnMissing` to throw/callback an error o a miss during a `.get( "key" )`. Thanks to [David Godfrey](https://github.com/david-byng) for the pull [#45](https://github.com/mpneuried/nodecache/pull/45). Added docker files and a script to run test on different node versions locally|
-|3.0.1|2016-01-13|Added `.unref()` to the checkTimeout so until node `0.10` it's not necessary to call `.close()` when your script is done. Thanks to [Doug Moscrop](https://github.com/dougmoscrop) for the pull [#44](https://github.com/mpneuried/nodecache/pull/44).|
-|3.0.0|2015-05-29|Return a cloned version of the cached element and save a cloned version of a variable. This can be disabled by setting the option `useClones:false`. (Thanks for #27 to [cheshirecatalyst](https://github.com/cheshirecatalyst) and for #30 to [Matthieu Sieben](https://github.com/matthieusieben))|
-|~~2.2.0~~|~~2015-05-27~~|REVOKED VERSION, because of conficts. See [Issue #30](https://github.com/mpneuried/nodecache/issues/30). So `2.2.0` is now `3.0.0`|
-|2.1.1|2015-04-17|Passed old value to the `del` event. Thanks to [Qix](https://github.com/qix) for the pull.|
-|2.1.0|2015-04-17|Changed get miss to return `undefined` instead of an error. Thanks to all [#11](https://github.com/mpneuried/nodecache/issues/11) contributors |
-|2.0.1|2015-04-17|Added close function (Thanks to [ownagedj](https://github.com/ownagedj)). Changed the development environment to use grunt.|
-|2.0.0|2015-01-05|changed return format of `.get()` with a error return on a miss and added the `.mget()` method. *Side effect: Performance of .get() up to 330 times faster!*|
-|1.1.0|2015-01-05|added `.keys()` method to list all existing keys|
-|1.0.3|2014-11-07|fix for setting numeric values. Thanks to [kaspars](https://github.com/kaspars) + optimized key ckeck.|
-|1.0.2|2014-09-17|Small change for better ttl handling|
-|1.0.1|2014-05-22|Readme typos. Thanks to [mjschranz](https://github.com/mjschranz)|
-|1.0.0|2014-04-09|Made `callback`s optional. So it's now possible to use a syncron syntax. The old syntax should also work well. Push : Bugfix for the value `0`|
-|0.4.1|2013-10-02|Added the value to `expired` event|
-|0.4.0|2013-10-02|Added nodecache events|
-|0.3.2|2012-05-31|Added Travis tests|
+|1.0.0|2024-03-01|Fork from `node_cache` TS rewrite and `SnowCache` added.|
 
-[![NPM](https://nodei.co/npm-dl/snow-cache.png?months=6)](https://nodei.co/npm/snow-cache/)
 
 ## Other projects
 
 |Name|Description|
 |:--|:--|
+|[**node-cache**](https://github.com/smrchy/rsmq)|Project that we are a humble clone of|
 |[**rsmq**](https://github.com/smrchy/rsmq)|A really simple message queue based on redis|
 |[**redis-heartbeat**](https://github.com/mpneuried/redis-heartbeat)|Pulse a heartbeat to redis. This can be used to detach or attach servers to nginx or similar problems.|
 |[**systemhealth**](https://github.com/mpneuried/systemhealth)|Node module to run simple custom checks for your machine or it's connections. It will use [redis-heartbeat](https://github.com/mpneuried/redis-heartbeat) to send the current state to redis.|

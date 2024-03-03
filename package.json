@@ -28,7 +28,7 @@
   "author": "Jan Topinski <hijan.topinski@snowflake.com>",
   "license": "MIT",
   "scripts": {
-    "bundle": "esbuild src/index.ts --outdir=bundle --sourcemap --bundle --platform=node --target=node20.10.0",
+    "bundle": "esbuild index.ts --outdir=bundle --sourcemap --bundle --platform=node --target=node20.10.0",
     "clean": "rimraf dist",
     "compile": "tsc",
     "compile-watch": "tsc -w",
