@@ -448,9 +448,9 @@ In separate terminals run:
 
 `cd test; docker-compose up` this will start `grafana` and `influxdb`
 
-`node dist/test/mock_server.js` this you will need to restart on change
+`npm run mock-server-watch` this will watch for your changes
 
-`docker-compose run k6 run /scripts/load.k6.js` the catalogue is from docker but it autorefreshes
+`docker-compose run k6 run /scripts/load.k6.js` the catalogue is from docker.
 
 Now click this link http://localhost:3000/dashboards select prefered dashboard and enjoy the show `refresh` is an icon in right upper conrner ![refreash icon](./img/refresh.png).
 

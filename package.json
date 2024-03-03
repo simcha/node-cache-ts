@@ -32,6 +32,7 @@
     "clean": "rimraf dist",
     "compile": "tsc",
     "compile-watch": "tsc -w",
+    "mock-server-watch": "nodemon --watch dist --exec 'node dist/test/mock_server.js'",
     "dev": "nodemon --watch src --watch test --ext ts,json --exec 'yarn bundle && yarn start'",
     "format": "prettier . --write",
     "format-check": "prettier . --check",
