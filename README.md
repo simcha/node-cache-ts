@@ -450,7 +450,11 @@ In separate terminals run:
 
 `npm run mock-server-watch` this will watch for your changes
 
-`docker-compose run k6 run /scripts/load.k6.js` the catalogue is from docker.
+```bash
+cd ./test/
+docker-compose run k6 run /scripts/load.k6.js
+```
+The catalogue is from docker.
 
 Now click this link http://localhost:3000/dashboards select prefered dashboard and enjoy the show `refresh` is an icon in right upper conrner ![refreash icon](./img/refresh.png). You can change scerios to ones commented out in the `./test/load.k6.js`.
 
