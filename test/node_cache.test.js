@@ -4,7 +4,7 @@ chai.should();
 
 const pkg  = JSON.parse(fs.readFileSync("package.json").toString());
 
-import { NodeCache } from "../dist/src/lib/node_cache";
+import NodeCache from "../dist/src/node_cache";
 import { randomNumber, randomString, diffKeys } from "./helpers";
 import { describe, after, before, it, beforeEach } from "node:test";
 import Timeouts from 'timers/promises';

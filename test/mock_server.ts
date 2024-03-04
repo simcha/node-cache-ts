@@ -5,7 +5,7 @@ import { setTimeout } from 'timers/promises';
 
 const usage = `
 Use it like this, where 12 is a number of miliseconds to sleep:
-http//localhost:7878/sleep/12/key/value
+http//localhost:7878/{raw,node,snow}/{sleep_time}/{key}/{value}/{error probability 0-1}
 `;
 const nodeCache = new NodeCache<string>({
 	stdTTL: 20
@@ -19,11 +19,12 @@ const snowCache = new SnowCache<{sleepTime: number, key: string, value: string, 
 });
 
 const mockServiceCall = async (sleepTime: number, key: string, value: string, flak: number) => {
-    let answer = `${key}:${value}\n`;
     await setTimeout(sleepTime);
-    if(value.startsWith('time')) {
-        answer = `{"now":${Date.now()}}`;
-    }
+    const answer = `{
+            "now":${Date.now()},
+            "key":${key},
+            "value":${value}
+    }\n`;
     if (Math.random() < flak) {
         throw Error('Random error');
     }
