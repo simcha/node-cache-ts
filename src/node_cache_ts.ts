@@ -16,7 +16,7 @@ export type RefreshOptions = Options & {
  * A are the arguments to the refreshMethod method refreshing keys
  * T is a type of the value to be cached
  */
-export class SnowCache<A extends {[key: string]: Serializable}, T> extends NodeCache<T> {
+export class NodeCacheTs<A extends {[key: string]: Serializable}, T> extends NodeCache<T> {
     refreshMethod: (args: A) => Promise<T>;
     private _refreshArgsCache: NodeCache<A>;
     private _runningCalls: {[key: string]: Promise<T>} = {};

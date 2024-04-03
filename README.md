@@ -12,12 +12,12 @@ We took 5.1.2 rewriten it to TypeScript and added high performance options in se
 
 Although not breaking per definition, our typescript rewrite changed internal function.
 
-Cache is not suporting `useClones` option set to `true` with functions as values. Use `SnowCache` to achive similar or better effect.
+Cache is not suporting `useClones` option set to `true` with functions as values. Use `NodeCacheTs` to achive similar or better effect.
 
 # Install
 
 ```bash
-	npm install snow-cache --save
+	npm install node-cache-ts --save
 ```
 
 # Examples:
@@ -25,7 +25,7 @@ Cache is not suporting `useClones` option set to `true` with functions as values
 ## Initialize (INIT):
 
 ```js
-const NodeCache = require( "snow-cache" );
+const { NodeCache } = require( "node-cache-ts" );
 const myCache = new NodeCache();
 ```
 
@@ -47,15 +47,15 @@ If `true` the variable will be deleted. If `false` the variable will remain. You
 ## NodeCache:
 
 ```ts
-import NodeCache from 'snow-cache';
+import { NodeCache } from 'node-cache-ts';
 const stringCache = new NodeCache<string>( { stdTTL: 100, checkperiod: 120 } );
 ```
 
-## SnowCache:
+## NodeCacheTs:
 
 ```ts
-import { SnowCache } from 'snow-cache';
-const myServiceCache = new SnowCache<{key: string}, string>( { stdTTL: 100 }, async (args: { name: string }): Promise<string> => {
+import NodeCacheTs from 'node-cache-ts';
+const myServiceCache = new NodeCacheTs<{key: string}, string>( { stdTTL: 100 }, async (args: { name: string }): Promise<string> => {
     return await myServiceCall(args.name);
 } );
 
@@ -64,17 +64,17 @@ const myResult = myServiceCache.call('key', { 'John' });
 or if you don't like types:
 
 ```js
-import { SnowCache } from 'snow-cache';
-const myServiceCache = new SnowCache( { stdTTL: 100 }, async ( args ) => {
+import { NodeCacheTs } from 'node-cache-ts';
+const myServiceCache = new NodeCacheTs( { stdTTL: 100 }, async ( args ) => {
     return await myServiceCall(args);
 } );
 
 const myResult = myServiceCache.call('key', { 'John' });
 ```
 
-`SnowCache` is generally quicker and more resilent to errors see result of our tests.
+`NodeCacheTs` is generally quicker and more resilent to errors see result of our tests.
 
-|NodeCache|SnowCache|
+|NodeCache|NodeCacheTs|
 |:--:|:--:|
 |![node_cache throughput](./img/node_cache_throughput.png)|![snow_cache throughput](./img/snow_cache_throughput.png)
 ![node_cache latency](./img/node_cache_latency.png)|![snow_cache latency](./img/snow_cache_latency.png)
@@ -83,7 +83,7 @@ const myResult = myServiceCache.call('key', { 'John' });
 
 Here the test for the flaky service throwing error code 500 with probability of 1%:
 
-|NodeCache|SnowCache|
+|NodeCache|NodeCacheTs|
 |:--:|:--:|
 |![node_cache errors](./img/node_cache_errors.png)|![snow_cache errors](./img/snow_cache_errors.png)
 
@@ -91,7 +91,7 @@ Errors disapear in second phase of the tests as subsequent calls are repeated in
 
 And data is refreshed in the same phase. However number of calls to the server is significantly lower. Due to the fact that SnowCashe will call the server only for cached arguments and NodeCache will call as many times as many threads ask for same inforation and no data is in the cache.
 
-## Only in SnowCache (rest is inherited from NodeCache):
+## Only in NodeCacheTs (rest is inherited from NodeCache):
 `myCache.call( key, { arg1 } )`
 
 Cache will call a method past during construction and cache both it's result and arguments for that method under the `key`. Both arguments and result well be selialized unless `option.argsUseClones` is set to false.
@@ -377,7 +377,7 @@ myCache.close();
 
 # Events
 
-## refresh_error (SnowCache only)
+## refresh_error (NodeCacheTs only)
 
 On error `refresh_error` event will be emited __remember__ to catch it and __log__ it or act upon it. 
 
@@ -460,13 +460,13 @@ Now click this link http://localhost:3000/dashboards select prefered dashboard a
 
 ## Compatibility
 
-snow-cache supports all node versions >= 8 (check!!!)
+node-cache-ts supports all node versions >= 8 (check!!!)
 
 ## Release History
 
 |Version|Date|Description|
 |:--:|:--:|:--|
-|1.0.0|2024-03-01|Fork from `node_cache` TS rewrite and `SnowCache` added.|
+|1.0.0|2024-03-01|Fork from `node_cache` TS rewrite and `NodeCacheTs` added.|
 
 
 ## Other projects
@@ -496,7 +496,7 @@ snow-cache supports all node versions >= 8 (check!!!)
 
 # The MIT License (MIT)
 
-Copyright © 2019 Mathias Peter and the snow-cache maintainers, https://github.com/snow-cache/snow-cache
+Copyright © 2024 Jan Topinski and the node-cache maintainers, https://github.com/node-cache/node-cache
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

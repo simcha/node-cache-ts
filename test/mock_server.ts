@@ -1,6 +1,6 @@
 import http from 'http';
 import NodeCache from '../src/node_cache';
-import { SnowCache } from '../src/snow_cache';
+import { NodeCacheTs } from '../src/node_cache_ts';
 import { setTimeout } from 'timers/promises';
 
 const usage = `
@@ -11,7 +11,7 @@ const nodeCache = new NodeCache<string>({
 	stdTTL: 20
 });
 
-const snowCache = new SnowCache<{sleepTime: number, key: string, value: string, flak: number}, string>({
+const snowCache = new NodeCacheTs<{sleepTime: number, key: string, value: string, flak: number}, string>({
     stdTTL: 20,
     ttr: 0.01
 }, async (args: {sleepTime: number, key: string, value: string, flak: number}): Promise<string> => {

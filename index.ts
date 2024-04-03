@@ -1,5 +1,5 @@
-import NodeCache from "./src/node_cache";
+import { NodeCacheTs } from "./src/node_cache_ts";
 
-export default NodeCache;
-export * from './src/snow_cache';
+export default NodeCacheTs;
+export * from './src/node_cache_ts';
 export * from './src/node_cache';
