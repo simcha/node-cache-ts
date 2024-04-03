@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [8.x, 9.x, 10.x, 11.x, 12.x, 13.x, 14.x]
+        node-version: [8.x, 9.x, 10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x, 18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 14.x]
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
@@ -22,10 +22,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm version
-    - run: npm ci || npm install
-    - run: npm run build
+    - run: npm ci
+    - run: npm run compile
     - run: npm test
-    - run: npm run export-coverage
     - name: Coveralls Parallel
       uses: coverallsapp/github-action@master
       with:
