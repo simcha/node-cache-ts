@@ -1,29 +1,37 @@
 {
-  "name": "nodejs-typescript-modern-starter",
+  "name": "node-cache-ts",
   "version": "1.0.0",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
-  "bin": {
-    "nodejs-typescript-modern-starter": "dist/src/index.js",
-    "ntms": "dist/src/index.js"
-  },
+  "main": "dist/src/node_cache_ts.js",
+  "typings": "dist/src/node_cache_ts.d.ts",
+  "homepage": "https://github.com/simcha/node-cache-ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xddq/schema2typebox.git"
+    "url": "git://github.com/simcha/node-cache-ts.git"
   },
+  "description": "Simple and fast NodeJS internal caching. Node internal in memory cache like memcached.",
   "keywords": [
-    "nodejs",
-    "typescript",
-    "modern",
-    "starter",
-    "nodejs typescript modern starter",
-    "debugging",
-    "ts",
-    "esbuild",
-    "prettier",
-    "typescript5",
-    "CI/CD",
-    "minimal"
+    "cache",
+    "caching",
+    "local",
+    "variable",
+    "multi",
+    "memory",
+    "internal",
+    "node",
+    "memcached",
+    "object"
+  ],
+  "tags": [
+    "cache",
+    "caching",
+    "local",
+    "variable",
+    "multi",
+    "memory",
+    "internal",
+    "node",
+    "memcached",
+    "object"
   ],
   "author": "Jan Topinski <hijan.topinski@snowflake.com>",
   "license": "MIT",
